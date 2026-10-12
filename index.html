@@ -39,7 +39,7 @@
 <script>
 function g(q){ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q); }
 const DAYS = [
-  {id:"d17", nav:"17/10 六", title:"17/10 星期六 · 09:00 落機", sub:"Check-in 後順路裕華。澳牛之後：巧佳 → 先達 → 嘉多娜 → 佐敦站。再去上海街618、朗豪坊。晚餐 18:30–20:00。",
+  {id:"d17", nav:"17/10 六", title:"17/10 星期六 · 09:00 落機", sub:"Check-in 後順路裕華。澳牛之後：巧佳 → 先達 → 嘉多娜 → 佐敦站。再去上海街618、朗豪坊、金華冰廳、佳佳甜品。晚餐女人街食飯公司 18:30–20:00。",
     stops:[
       {t:"09:00 開始", name:"香港國際機場", lat:22.3089, lng:113.9146, ride:null, link:g("Hong Kong International Airport")},
       {t:"約 10:15", name:"逸東酒店 check-in／寄行李", lat:22.3059, lng:114.1714, ride:"專車接送。機場 → 逸東，約 35–50 分鐘。正式入住多數 15:00，先寄行李。", shuttle:true, link:g("Eaton HK 380 Nathan Road Jordan")},
@@ -51,9 +51,11 @@ const DAYS = [
       {t:"約 15:25–15:55", name:"嘉多娜餅屋", lat:22.3042, lng:114.1668, ride:"寶靈商場西行去文苑街1–23號文英樓地下，約 10–12 分鐘。布甸包。買完東行返佐敦站約 10–12 分鐘，或去柯士甸站 A 出口約 4 分鐘再坐一站。", link:"https://www.openrice.com/zh/hongkong/r-%E5%98%89%E5%A4%9A%E5%A8%9C%E9%A4%85%E5%B1%8B-%E4%BD%90%E6%95%A6-%E6%B8%AF%E5%BC%8F-%E9%BA%B5%E5%8C%85%E5%BA%97-r539357"},
       {t:"約 16:10", name:"佐敦站 → 旺角", lat:22.3049, lng:114.1718, ride:"嘉多娜步行返佐敦站約 10–12 分鐘。港鐵荃灣線佐敦 → 旺角，1 站，約 3 分鐘。", link:g("Jordan Station")},
       {t:"約 16:25–17:10", name:"黑地 + REstoreHKshop", lat:22.3196, lng:114.1692, ride:"旺角站 C2 出口步行約 5 分鐘，上海街618號。黑地地下，REstore 1樓102B&C，同一幢。再步行去朗豪坊約 3–5 分鐘。", link:g("上海街618號 旺角")},
-      {t:"約 17:15–18:15", name:"朗豪坊", lat:22.3182, lng:114.1686, ride:"上海街618步行約 3–5 分鐘，旺角站 C 出口。", link:g("Langham Place Mong Kok")},
-      {t:"18:30–20:00", name:"女人街食飯公司（旺角）", lat:22.3188, lng:114.1702, ride:"朗豪坊步行去通菜街（女人街），旺角站 E2 出口約 5 分鐘。地址：通菜街1A-1L威達商業大廈1樓B室。17:30–00:00，建議訂位。", link:"https://www.openrice.com/zh/hongkong/r-%E5%A5%B3%E4%BA%BA%E8%A1%97%E9%A3%9F%E9%A3%AF%E5%85%AC%E5%8F%B8-%E6%97%BA%E8%A7%92-%E6%B8%AF%E5%BC%8F-r591730"},
-      {t:"約 20:20 結束", name:"返逸東酒店", lat:22.3059, lng:114.1714, ride:"港鐵旺角站 → 佐敦站，1 站，約 3–5 分鐘。再步行 8–12 分鐘。", link:g("Eaton HK Jordan")}
+      {t:"約 17:15–17:50", name:"朗豪坊", lat:22.3182, lng:114.1686, ride:"上海街618步行約 3–5 分鐘，旺角站 C 出口。", link:g("Langham Place Mong Kok")},
+      {t:"約 18:00–18:30", name:"金華冰廳", lat:22.3222, lng:114.1696, ride:"朗豪坊北行去太子弼街47號，約 8–12 分鐘。得獎菠蘿油、奶茶。太子站 B2 出口步行約 3 分鐘。", link:"https://www.openrice.com/zh/hongkong/r-%E9%87%91%E8%8F%AF%E5%86%B0%E5%BB%B3-%E5%A4%AA%E5%AD%90-%E6%B8%AF%E5%BC%8F-r11293"},
+      {t:"約 18:40–19:10", name:"佳佳甜品（旺角）", lat:22.3165, lng:114.1708, ride:"金華冰廳南行去花園街1號地下2號舖，約 10–15 分鐘。米芝蓮推薦糖水。油麻地站 A2 出口步行約 5 分鐘。", link:"https://www.openrice.com/zh/hongkong/r-%E4%BD%B3%E4%BD%B3%E7%94%9C%E5%93%81-%E6%97%BA%E8%A7%92-%E6%B8%AF%E5%BC%8F-%E7%94%9C%E5%93%81-%E7%B3%96%E6%B0%B4-r895823"},
+      {t:"19:20–20:30", name:"女人街食飯公司（旺角）", lat:22.3188, lng:114.1702, ride:"花園街步行去通菜街（女人街）約 5–8 分鐘。地址：通菜街1A-1L威達商業大廈1樓B室。17:30–00:00，建議訂位。", link:"https://www.openrice.com/zh/hongkong/r-%E5%A5%B3%E4%BA%BA%E8%A1%97%E9%A3%9F%E9%A3%AF%E5%85%AC%E5%8F%B8-%E6%97%BA%E8%A7%92-%E6%B8%AF%E5%BC%8F-r591730"},
+      {t:"約 20:50 結束", name:"返逸東酒店", lat:22.3059, lng:114.1714, ride:"港鐵旺角站 → 佐敦站，1 站，約 3–5 分鐘。再步行 8–12 分鐘。", link:g("Eaton HK Jordan")}
     ]},
   {id:"d18", nav:"18/10 日", title:"18/10 星期日 · 港島", sub:"早餐豪隍點心茶居（灣仔太原街）。大館取消。天台要去。艇王 19:30。",
     stops:[
