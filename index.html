@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>香港行程 17–21/10/2026</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<title>香港行程 17–21/10/2026 (Google Maps)</title>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaUVwToD12G0-6uH_wNQYNGSmWWkw6h2Y&callback=initMap" async defer></script>
 <style>
   :root { --map-h:250px; --nav-h:48px; --ink:#1c1917; --muted:#57534e; --line:#e7e0d6; --paper:#faf6f0; --red:#9b2335; --blue:#1e4d6b; }
   * { box-sizing:border-box; }
   body { margin:0; font-family:"PingFang HK","Noto Sans CJK TC","Microsoft JhengHei",sans-serif; background:var(--paper); color:var(--ink); line-height:1.45; }
   #map { position:fixed; top:0; left:0; right:0; height:var(--map-h); z-index:20; background:#e7eef2; border-bottom:3px solid var(--red); }
+  #resize-handle { position:fixed; top:var(--map-h); left:0; right:0; height:12px; z-index:25; background:linear-gradient(to bottom, #9b2335, #7a1d2a); cursor:ns-resize; display:flex; align-items:center; justify-content:center; touch-action:none; }
+  #resize-handle::after { content:""; width:40px; height:3px; background:rgba(255,255,255,.6); border-radius:2px; }
   .map-label { position:fixed; top:8px; left:10px; z-index:500; background:rgba(28,25,23,.84); color:#fff; border-radius:999px; padding:5px 9px; font-size:12px; }
-  nav { position:fixed; top:var(--map-h); left:0; right:0; z-index:19; height:var(--nav-h); display:flex; gap:6px; overflow-x:auto; background:#fffdf9; border-bottom:1px solid var(--line); padding:8px 10px; }
+  nav { position:fixed; top:calc(var(--map-h) + 12px); left:0; right:0; z-index:19; height:var(--nav-h); display:flex; gap:6px; overflow-x:auto; background:#fffdf9; border-bottom:1px solid var(--line); padding:8px 10px; }
   nav button { border:1px solid var(--line); background:#fff; color:var(--red); border-radius:999px; padding:5px 10px; white-space:nowrap; cursor:pointer; }
   nav button.on { background:var(--red); color:#fff; }
-  main { padding:calc(var(--map-h) + var(--nav-h) + 12px) 14px 48px; max-width:980px; margin:0 auto; }
+  main { padding:calc(var(--map-h) + 12px + var(--nav-h) + 12px) 14px 48px; max-width:980px; margin:0 auto; }
   .alert { background:#fff4ec; border:1px solid #fdba74; color:#7c2d12; border-radius:12px; padding:10px 12px; font-size:.92rem; }
   table.main { width:100%; border-collapse:collapse; background:#fff; font-size:.9rem; }
   table.main th, table.main td { border:1px solid var(--line); padding:8px; vertical-align:top; }
@@ -33,6 +34,7 @@
 </head>
 <body>
 <div id="map"></div>
+<div id="resize-handle"></div>
 <div class="map-label" id="mapLabel">全日路線</div>
 <nav id="nav"></nav>
 <main id="app"></main>
@@ -95,64 +97,115 @@ const DAYS = [
     stops:[
       {t:"約 07:45 開始", name:"逸東酒店退房", lat:22.3059, lng:114.1714, ride:null, link:g("Eaton HK Jordan")},
       {t:"約 08:00–08:40", name:"盛記粥麵", lat:22.305, lng:114.1705, ride:"步行去白加士街11號，約 5–8 分鐘。佐敦站 C2 出口行 2 分鐘。", link:"https://www.openrice.com/zh/hongkong/r-%E7%9B%9B%E8%A8%98%E7%B2%A5%E9%BA%B5-%E4%BD%90%E6%95%A6-%E7%B2%B5%E8%8F%9C-%E5%BB%A3%E6%9D%B1-%E7%B2%A5%E5%93%81-r591786"},
-      {t:"約 09:30", name:"迪士尼探索家度假酒店", lat:22.3115, lng:114.0448, ride:"專車接送。逸東 → 探索家，約 35–50 分鐘。寄行李後入園。", shuttle:true, link:g("Disney Explorers Lodge")},
+      {t:"約 09:30", name:"迪士尼探索家度假酒店", lat:22.3083, lng:114.0387, ride:"專車接送。逸東 → 探索家，約 35–50 分鐘。寄行李後入園。", shuttle:true, link:g("Disney Explorers Lodge")},
       {t:"10:30 入園", name:"香港迪士尼樂園", lat:22.3132, lng:114.0413, ride:"酒店穿梭巴士去交匯處，5–10 分鐘，住客免費。要預先買 20/10 指定日子門票。", link:g("Hong Kong Disneyland")},
-      {t:"晚上結束", name:"返探索家酒店", lat:22.3115, lng:114.0448, ride:"穿梭巴士返酒店，5–10 分鐘。今晚住呢度。", link:g("Disney Explorers Lodge")}
+      {t:"晚上結束", name:"返探索家酒店", lat:22.3083, lng:114.0387, ride:"穿梭巴士返酒店，5–10 分鐘。今晚住呢度。", link:g("Disney Explorers Lodge")}
     ]},
   {id:"d21", nav:"21/10 三", title:"21/10 星期三 · 大佛 → 機場", sub:"由探索家出門。平日纜車 10:00 開。終點機場。",
     stops:[
-      {t:"約 08:20 開始", name:"探索家酒店退房", lat:22.3115, lng:114.0448, ride:null, link:g("Disney Explorers Lodge")},
-      {t:"約 09:15", name:"東涌站", lat:22.2892, lng:114.1506, ride:"穿梭巴士去交匯處 5–10 分鐘。港鐵迪士尼線 → 欣澳轉東涌線 → 東涌，25–35 分鐘。", link:g("Tung Chung Station")},
-      {t:"約 09:20–09:40", name:"KJ Lockers", lat:22.2894, lng:114.1502, ride:"東涌站步行約 200 米。每日 $50。", link:g("KJ Lockers Tung Chung")},
-      {t:"約 10:05–10:35", name:"昂坪 360", lat:22.2558, lng:113.9045, ride:"步行去纜車站 1–2 分鐘。上山約 25 分鐘。必須預先買來回飛。", link:g("Ngong Ping 360")},
-      {t:"約 10:40–11:25", name:"天壇大佛", lat:22.2538, lng:113.9047, ride:"市集步行加 268 級，約 15–20 分鐘。免費。", link:g("Tian Tan Buddha")},
-      {t:"約 11:40–12:20", name:"華星冰室", lat:22.2562, lng:113.9052, ride:"落石級返市集，10–15 分鐘。", link:g("華星冰室 昂坪")},
-      {t:"約 13:20", name:"東涌站取行李", lat:22.2894, lng:114.1502, ride:"纜車落山約 25 分鐘。", link:g("Tung Chung Station")},
+      {t:"約 08:20 開始", name:"探索家酒店退房", lat:22.3083, lng:114.0387, ride:null, link:g("Disney Explorers Lodge")},
+      {t:"約 09:15", name:"東涌站", lat:22.2893, lng:113.9416, ride:"穿梭巴士去交匯處 5–10 分鐘。港鐵迪士尼線 → 欣澳轉東涌線 → 東涌，25–35 分鐘。", link:g("Tung Chung Station")},
+      {t:"約 09:20–09:40", name:"KJ Lockers", lat:22.2895, lng:113.9408, ride:"東涌站步行約 200 米。每日 $50。", link:g("KJ Lockers Tung Chung")},
+      {t:"約 10:05–10:35", name:"昂坪 360", lat:22.2565, lng:113.9016, ride:"步行去纜車站 1–2 分鐘。上山約 25 分鐘。必須預先買來回飛。", link:g("Ngong Ping 360")},
+      {t:"約 10:40–11:25", name:"天壇大佛", lat:22.2538, lng:113.9043, ride:"市集步行加 268 級，約 15–20 分鐘。免費。", link:g("Tian Tan Buddha")},
+      {t:"約 11:40–12:20", name:"華星冰室", lat:22.2555, lng:113.9035, ride:"落石級返市集，10–15 分鐘。", link:g("華星冰室 昂坪")},
+      {t:"約 13:20", name:"東涌站取行李", lat:22.2893, lng:113.9416, ride:"纜車落山約 25 分鐘。", link:g("Tung Chung Station")},
       {t:"約 13:40 結束", name:"香港國際機場", lat:22.3089, lng:113.9146, ride:"機場快線東涌 → 機場，1 站，10–12 分鐘。", link:g("Hong Kong International Airport")}
     ]}
 ];
-let current = "d17", map, layer, highlight;
-function ensureMap(){
-  if (map) return;
-  map = L.map("map", {zoomControl:true});
-  const a = L.tileLayer("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png", {maxZoom:18, attribution:"Wikimedia"});
-  const b = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {subdomains:"abc", maxZoom:18, attribution:"OSM"});
-  let n=0; a.addTo(map); a.on("tileerror", () => { if(++n>=2){ map.removeLayer(a); b.addTo(map);} });
-  layer = L.layerGroup().addTo(map);
-  highlight = L.layerGroup().addTo(map);
+let current = "d17", map, directionsService, directionsRenderer, markers = [], polylines = [], highlightPoly = null;
+
+function initMap(){
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: {lat: 22.32, lng: 114.17},
+    zoom: 12,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: true
+  });
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true, preserveViewport: false});
+  directionsRenderer.setMap(map);
+  render();
 }
+
+function clearMap(){
+  markers.forEach(m => m.setMap(null));
+  markers = [];
+  polylines.forEach(p => p.setMap(null));
+  polylines = [];
+  if (highlightPoly) { highlightPoly.setMap(null); highlightPoly = null; }
+}
+
 function draw(stops){
-  ensureMap();
-  layer.clearLayers();
-  highlight.clearLayers();
-  const pts = stops.map(s => [s.lat, s.lng]);
-  // 全日路線
-  L.polyline(pts, {color:"#9b2335", weight:4, opacity:.7}).addTo(layer);
-  // 各段交通線（可點擊高亮）
-  for(let i=1;i<stops.length;i++){
+  if (!map) return;
+  clearMap();
+  const bounds = new google.maps.LatLngBounds();
+  stops.forEach((s, i) => {
+    const pos = {lat: s.lat, lng: s.lng};
+    bounds.extend(pos);
+    const marker = new google.maps.Marker({
+      position: pos,
+      map: map,
+      title: (i+1) + ". " + s.name,
+      label: {text: String(i+1), color: "#fff", fontWeight: "bold"},
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 12,
+        fillColor: s.shuttle ? "#a16207" : "#9b2335",
+        fillOpacity: 1,
+        strokeColor: "#fff",
+        strokeWeight: 2
+      }
+    });
+    markers.push(marker);
+  });
+  // 全日路線 polyline
+  const path = stops.map(s => ({lat: s.lat, lng: s.lng}));
+  const poly = new google.maps.Polyline({
+    path: path,
+    geodesic: true,
+    strokeColor: "#9b2335",
+    strokeOpacity: 0.7,
+    strokeWeight: 4,
+    map: map
+  });
+  polylines.push(poly);
+  // 各段
+  for (let i = 1; i < stops.length; i++) {
     const from = stops[i-1], to = stops[i];
-    const seg = L.polyline([[from.lat,from.lng],[to.lat,to.lng]], {
-      color: to.shuttle ? "#a16207" : "#1e4d6b",
-      weight: 3,
-      opacity: 0.55,
-      dashArray: to.shuttle ? null : "6,4"
-    }).addTo(layer);
-    const mid = [(from.lat+to.lat)/2, (from.lng+to.lng)/2];
-    const short = (to.ride||"").split("。")[0].slice(0,28);
-    L.circleMarker(mid, {radius:4, color:"#fff", weight:1, fillColor: to.shuttle?"#a16207":"#1e4d6b", fillOpacity:0.9})
-      .addTo(layer)
-      .bindTooltip(short || "交通", {direction:"top"});
+    const seg = new google.maps.Polyline({
+      path: [{lat: from.lat, lng: from.lng}, {lat: to.lat, lng: to.lng}],
+      geodesic: true,
+      strokeColor: to.shuttle ? "#a16207" : "#1e4d6b",
+      strokeOpacity: 0.55,
+      strokeWeight: 3,
+      map: map
+    });
+    polylines.push(seg);
   }
-  stops.forEach((s,i) => L.circleMarker([s.lat,s.lng], {radius:7, color:"#fff", weight:2, fillColor:s.shuttle?"#a16207":"#9b2335", fillOpacity:1}).addTo(layer).bindTooltip((i+1)+". "+s.name));
-  map.fitBounds(pts, {padding:[28,28], maxZoom:13});
-  setTimeout(() => map.invalidateSize(), 50);
+  map.fitBounds(bounds);
 }
+
 function highlightSeg(from, to){
-  ensureMap();
-  highlight.clearLayers();
-  if(!from || !to) return;
-  L.polyline([[from.lat,from.lng],[to.lat,to.lng]], {color:"#d97706", weight:7, opacity:0.95}).addTo(highlight);
-  map.fitBounds([[from.lat,from.lng],[to.lat,to.lng]], {padding:[40,40], maxZoom:15});
+  if (!map || !from || !to) return;
+  if (highlightPoly) highlightPoly.setMap(null);
+  highlightPoly = new google.maps.Polyline({
+    path: [{lat: from.lat, lng: from.lng}, {lat: to.lat, lng: to.lng}],
+    geodesic: true,
+    strokeColor: "#d97706",
+    strokeOpacity: 0.95,
+    strokeWeight: 7,
+    map: map
+  });
+  const bounds = new google.maps.LatLngBounds();
+  bounds.extend({lat: from.lat, lng: from.lng});
+  bounds.extend({lat: to.lat, lng: to.lng});
+  map.fitBounds(bounds);
+}
+
+function ensureMap(){
+  // Google Maps 由 initMap 初始化
 }
 function render(){
   document.getElementById("nav").innerHTML = DAYS.map(d => `<button class="${d.id===current?"on":""}" data-day="${d.id}">${d.nav}</button>`).join("");
@@ -168,7 +221,11 @@ function render(){
   document.querySelectorAll("tr.loc").forEach(tr => tr.onclick = ev => {
     if (ev.target.tagName==="A") return;
     const s = day.stops.find(x => x.name===tr.dataset.name);
-    if (s) { ensureMap(); highlight.clearLayers(); map.setView([s.lat,s.lng], 15); }
+    if (s && map) {
+      if (highlightPoly) highlightPoly.setMap(null);
+      map.setCenter({lat: s.lat, lng: s.lng});
+      map.setZoom(15);
+    }
   });
   document.querySelectorAll("tr.ride").forEach(tr => tr.onclick = () => {
     const idx = parseInt(tr.dataset.idx,10);
@@ -178,7 +235,40 @@ function render(){
   });
   draw(day.stops);
 }
-render();
+// render();  // 由 initMap 呼叫
+
+// 地圖高度拖曳調整
+(function(){
+  const handle = document.getElementById("resize-handle");
+  let startY, startH, dragging = false;
+  function setH(px){
+    px = Math.max(120, Math.min(px, window.innerHeight * 0.75));
+    document.documentElement.style.setProperty("--map-h", px + "px");
+    if (map) setTimeout(() => google.maps.event.trigger(map, "resize"), 30);
+  }
+  handle.addEventListener("mousedown", e => {
+    dragging = true; startY = e.clientY; startH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--map-h")) || 250;
+    document.body.style.userSelect = "none";
+  });
+  document.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    setH(startH + (e.clientY - startY));
+  });
+  document.addEventListener("mouseup", () => { dragging = false; document.body.style.userSelect = ""; });
+  // touch
+  handle.addEventListener("touchstart", e => {
+    dragging = true; startY = e.touches[0].clientY; startH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--map-h")) || 250;
+    e.preventDefault();
+  }, {passive:false});
+  document.addEventListener("touchmove", e => {
+    if (!dragging) return;
+    setH(startH + (e.touches[0].clientY - startY));
+  }, {passive:true});
+  document.addEventListener("touchend", () => { dragging = false; });
+})();
 </script>
+<div style="position:fixed;bottom:8px;right:8px;background:#fff;padding:6px 10px;border-radius:8px;font-size:12px;z-index:30;border:1px solid #ccc;">
+  Google Maps 版本需要有效 API Key。<br>將 YOUR_API_KEY 換成你自己的 key 即可使用。
+</div>
 </body>
 </html>
