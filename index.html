@@ -38,12 +38,13 @@
 <div id="resize-handle"></div>
 <div class="map-label" id="mapLabel">全日路線</div>
 <div class="pin-name" id="pinName"></div>
+<button id="gpsBtn" style="position:fixed; top:calc(var(--map-h) + 16px); right:12px; z-index:30; background:#1e4d6b; color:#fff; border:none; border-radius:6px; padding:6px 10px; font-size:13px; cursor:pointer;">📍 定位</button>
 <nav id="nav"></nav>
 <main id="app"></main>
 <script>
 function g(q){ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q); }
 const DAYS = [
-  {id:"d17", nav:"17/10 六", title:"17/10 星期六 · 09:00 落機", sub:"Check-in 後順路裕華。澳牛之後：巧佳 → 先達 → 嘉多娜 → 佐敦站。再去上海街618、朗豪坊、金華冰廳。晚餐女人街食飯公司後去佳佳甜品。",
+  {id:"d17", nav:"17/10 六", title:"17/10 星期六 · 09:00 落機", sub:"Check-in 後順路裕華。澳牛之後：巧佳 → 先達 → 佐敦站。再去上海街618、朗豪坊、金華冰廳。晚餐女人街食飯公司後去佳佳甜品。",
     stops:[
       {t:"09:00 開始", name:"香港國際機場", lat:22.3089, lng:113.9146, ride:null, link:g("Hong Kong International Airport")},
       {t:"約 10:15", name:"逸東酒店 check-in／寄行李", lat:22.3080, lng:114.1718, ride:"專車接送。機場 → 逸東，約 35–50 分鐘。正式入住多數 15:00，先寄行李。", shuttle:true, link:g("Eaton HK 380 Nathan Road Jordan")},
@@ -52,8 +53,7 @@ const DAYS = [
       {t:"約 13:00–14:00", name:"澳洲牛奶公司", lat:22.3045, lng:114.1703, ride:"白加士街步行約 2 分鐘。蛋治、燉蛋。星期六可能再排。", link:"https://www.openrice.com/zh/hongkong/r-%E6%BE%B3%E6%B4%B2%E7%89%9B%E5%A5%B6%E5%85%AC%E5%8F%B8-%E4%BD%90%E6%95%A6-%E6%B8%AF%E5%BC%8F-r104"},
       {t:"約 14:10–14:40", name:"巧佳小巴用品", lat:22.3065, lng:114.1693, ride:"白加士街北行去炮台街39號閣樓，約 8–10 分鐘。注意：多個來源寫星期六日休息，去之前打 9017 9587 確認。", link:g("巧佳小巴用品 炮台街39號")},
       {t:"約 14:45–15:15", name:"先達商店", lat:22.3052, lng:114.1708, ride:"炮台街返南去吳松街150–164號寶靈商場1樓16–17號舖，約 8 分鐘。繡花鞋。大約 14:00 後先開。", link:g("先達商店 寶靈商場 吳松街")},
-      {t:"約 15:25–15:55", name:"嘉多娜餅屋", lat:22.3042, lng:114.1668, ride:"寶靈商場西行去文苑街1–23號文英樓地下，約 10–12 分鐘。布甸包。買完東行返佐敦站約 10–12 分鐘，或去柯士甸站 A 出口約 4 分鐘再坐一站。", link:"https://www.openrice.com/zh/hongkong/r-%E5%98%89%E5%A4%9A%E5%A8%9C%E9%A4%85%E5%B1%8B-%E4%BD%90%E6%95%A6-%E6%B8%AF%E5%BC%8F-%E9%BA%B5%E5%8C%85%E5%BA%97-r539357"},
-      {t:"約 16:10", name:"佐敦站 → 旺角", lat:22.3049, lng:114.1718, ride:"嘉多娜步行返佐敦站約 10–12 分鐘。港鐵荃灣線佐敦 → 旺角，1 站，約 3 分鐘。", link:g("Jordan Station")},
+      {t:"約 15:30", name:"佐敦站 → 旺角", lat:22.3049, lng:114.1718, ride:"先達商店步行返佐敦站約 8–10 分鐘。港鐵荃灣線佐敦 → 旺角，1 站，約 3 分鐘。", link:g("Jordan Station")},
       {t:"約 16:25–17:10", name:"黑地 + REstoreHKshop", lat:22.3196, lng:114.1692, ride:"旺角站 C2 出口步行約 5 分鐘，上海街618號。黑地地下，REstore 1樓102B&C，同一幢。", link:g("上海街618號 旺角")},
       {t:"約 17:15–17:40", name:"金華冰廳", lat:22.3222, lng:114.1696, ride:"上海街北行去太子弼街47號，約 8–12 分鐘。得獎菠蘿油、奶茶。", link:"https://www.openrice.com/zh/hongkong/r-%E9%87%91%E8%8F%AF%E5%86%B0%E5%BB%B3-%E5%A4%AA%E5%AD%90-%E6%B8%AF%E5%BC%8F-r11293"},
       {t:"約 17:45–18:10", name:"朗豪坊", lat:22.3182, lng:114.1686, ride:"金華冰廳南行返朗豪坊，約 8–10 分鐘。", link:g("Langham Place Mong Kok")},
@@ -71,27 +71,34 @@ const DAYS = [
       {t:"約 11:05–11:40", name:"藍屋", lat:22.2742, lng:114.1742, ride:"步行 8–10 分鐘。", link:g("Blue House Wan Chai")},
       {t:"約 12:10–13:20", name:"竺扶大班燒味", lat:22.2776, lng:114.1734, ride:"步行 8–12 分鐘。", link:g("竺扶大班燒味 灣仔")},
       {t:"約 13:45–14:25", name:"中環街市", lat:22.284, lng:114.1556, ride:"電車，灣仔德輔道中 → 中環街市站，15–25 分鐘。", link:g("Central Market Hong Kong")},
-      {t:"約 14:35–14:55", name:"石板街", lat:22.2832, lng:114.1551, ride:"中環街市步行約 8 分鐘。", link:g("Pottinger Street Central")},
+      {t:"約 14:30–14:45", name:"陳意齋", lat:22.2845, lng:114.1530, ride:"中環街市步行去皇后大道中176號，約 5–8 分鐘。百年零食老店，燕窩糕、杏仁餅。", link:"https://www.openrice.com/zh/hongkong/r-%E9%99%B3%E6%84%8F%E9%BD%8B-%E4%B8%AD%E7%92%B0-%E6%B8%AF%E5%BC%8F-r11064"},
+      {t:"約 14:50–15:05", name:"永吉街檸檬王", lat:22.2858, lng:114.1528, ride:"步行去永吉街18號，約 5 分鐘。甘草檸檬。上環站 E1 出口。", link:"https://www.openrice.com/zh/hongkong/r-%E6%AA%B8%E6%AA%AC%E7%8E%8B-%E4%B8%8A%E7%92%B0-%E6%B8%AF%E5%BC%8F-r12247"},
+      {t:"約 15:10–15:25", name:"王榮記", lat:22.2850, lng:114.1515, ride:"步行去蘇杭街52號，約 5–8 分鐘。百年涼果老店。", link:g("王榮記 蘇杭街52號")},
+      {t:"約 15:30–15:45", name:"上環文武廟", lat:22.2840, lng:114.1502, ride:"步行去荷李活道124-126號，約 5–8 分鐘。法定古蹟。", link:g("Man Mo Temple Sheung Wan")},
+      {t:"約 15:50–16:10", name:"石板街", lat:22.2832, lng:114.1551, ride:"文武廟步行返石板街，約 8–10 分鐘。", link:g("Pottinger Street Central")},
       {t:"約 15:00–15:25", name:"Bakehouse", lat:22.2822, lng:114.1548, ride:"步行 4–8 分鐘。", link:g("Bakehouse Central Hong Kong")},
-      {t:"約 15:40–17:20", name:"山頂纜車", lat:22.2714, lng:114.1498, ride:"步行去花園道纜車站 10–12 分鐘。單程 5–8 分鐘。", link:g("Peak Tram Hong Kong")},
+      {t:"約 15:50–16:10", name:"山頂纜車上山", lat:22.2775, lng:114.1595, ride:"步行去花園道纜車站約 10–12 分鐘。上山約 5–8 分鐘。", link:g("Peak Tram Garden Road Station")},
+      {t:"約 16:15–16:50", name:"太平山頂", lat:22.2714, lng:114.1498, ride:"纜車終點。可遊覽山頂廣場、凌霄閣。", link:g("The Peak Hong Kong")},
+      {t:"約 16:55–17:10", name:"山頂纜車落山", lat:22.2714, lng:114.1498, ride:"落山約 5–8 分鐘，返花園道站。", link:g("Peak Tram Peak Station")},
       {t:"19:30–21:00", name:"艇王", lat:22.2808, lng:114.1748, ride:"纜車落中環，港鐵香港站 → 灣仔站，約 8–12 分鐘。建議訂位。", link:g("艇王 灣仔")},
       {t:"約 21:10–21:40", name:"義順", lat:22.2802, lng:114.1836, ride:"電車或港鐵灣仔 → 銅鑼灣，10–15 分鐘。", link:g("義順 銅鑼灣")},
       {t:"約 21:50–22:20", name:"海運大廈天台", lat:22.2958, lng:114.1682, ride:"港鐵銅鑼灣轉金鐘去尖沙咀，約 20 分鐘。或返灣仔碼頭坐天星小輪 8 分鐘。", link:g("Harbour City Ocean Terminal Hong Kong")},
       {t:"約 22:35 結束", name:"返逸東酒店", lat:22.3080, lng:114.1718, ride:"港鐵尖沙咀 → 佐敦，1 站，約 3 分鐘。再步行 8–12 分鐘。", link:g("Eaton HK Jordan")}
     ]},
-  {id:"d19", nav:"19/10 一", title:"19/10 星期一 · 九龍", sub:"早餐紅茶冰室。之後 LOUDER，再返鐘樓。要去光影之旅、黃大仙、泰發。深水埗同粗菜館已刪。",
+  {id:"d19", nav:"19/10 一", title:"19/10 星期一 · 九龍", sub:"早餐紅茶冰室。之後紹香園、鐘樓，再去 LOUDER。要去光影之旅、黃大仙、泰發/泰金國。深水埗同粗菜館已刪。",
     stops:[
       {t:"約 08:15 開始", name:"逸東酒店", lat:22.3080, lng:114.1718, ride:null, link:g("Eaton HK Jordan")},
       {t:"約 08:40–09:30", name:"紅茶冰室", lat:22.2986, lng:114.1734, ride:"港鐵佐敦 → 尖沙咀，1 站。B2 出口步行約 2 分鐘，加拿芬道18號恆生尖沙咀大廈地下5號舖。07:00–23:00。", link:"https://www.openrice.com/zh/hongkong/r-%E7%B4%85%E8%8C%B6%E5%86%B0%E5%AE%A4-%E5%B0%96%E6%B2%99%E5%92%80-%E6%B8%AF%E5%BC%8F-r719709"},
-      {t:"約 09:40–10:20", name:"LOUDER", lat:22.2955, lng:114.1685, ride:"尖沙咀站步行去海港城海運大廈 2 樓 OT202，約 10–12 分鐘。本地品牌店，11:00–21:00。", link:g("LOUDER Harbour City Ocean Terminal")},
-      {t:"約 10:30–11:10", name:"鐘樓／海旁", lat:22.2936, lng:114.1693, ride:"海運大廈步行返鐘樓約 8–10 分鐘。", link:g("Clock Tower Tsim Sha Tsui")},
+      {t:"約 09:40–09:55", name:"紹香園", lat:22.2950, lng:114.1755, ride:"紅茶冰室步行去尖東站附近，約 8–10 分鐘。老字號果仁店，可試食。", link:g("紹香園 尖東")},
+      {t:"約 10:05–10:35", name:"鐘樓／海旁", lat:22.2936, lng:114.1693, ride:"步行去鐘樓約 8–10 分鐘。", link:g("Clock Tower Tsim Sha Tsui")},
+      {t:"約 10:45–11:15", name:"LOUDER", lat:22.2955, lng:114.1685, ride:"鐘樓步行去海港城海運大廈 2 樓 OT202，約 8–10 分鐘。本地品牌店，11:00–21:00。", link:g("LOUDER Harbour City Ocean Terminal")},
       {t:"約 11:20–12:40", name:"太平館", lat:22.2988, lng:114.1728, ride:"步行 8–12 分鐘。假期建議訂位。", link:g("太平館 尖沙咀")},
       {t:"約 13:00–14:20", name:"香港歷史博物館", lat:22.3018, lng:114.177, ride:"步行 12–18 分鐘。假期 10:00–19:00，常設展免費。", link:g("Hong Kong Museum of History")},
       {t:"約 14:30–14:50", name:"媽咪雞蛋仔", lat:22.2982, lng:114.1722, ride:"步行 10–15 分鐘。", link:g("媽咪雞蛋仔 尖沙咀")},
       {t:"約 15:20–16:00", name:"黃大仙祠", lat:22.3424, lng:114.1936, ride:"港鐵尖沙咀轉鑽石山／黃大仙，約 25–30 分鐘。再步行 5–8 分鐘。", link:g("Wong Tai Sin Temple")},
       {t:"約 16:30–17:20", name:"九龍城寨光影之旅", lat:22.3323, lng:114.1903, ride:"港鐵黃大仙轉樂富或的士約 12–15 分鐘。亦可港鐵去宋皇臺再步行 8–10 分鐘。下午籌 13:45 起派，先到先得。", link:g("Kowloon Walled City Park")},
       {t:"約 17:30–18:00", name:"雲津美食", lat:22.3312, lng:114.1886, ride:"公園步行去九龍城食街 8–12 分鐘。", link:g("雲津美食 九龍城")},
-      {t:"18:30–20:00", name:"泰發", lat:22.3304, lng:114.1894, ride:"步行 5–10 分鐘。假期建議訂位。", link:g("泰發 九龍城")},
+      {t:"18:30–20:00", name:"泰發／泰金國", lat:22.3304, lng:114.1894, ride:"步行 5–10 分鐘。兩間都係九龍城熱門泰國菜。", links:["https://www.openrice.com/zh/hongkong/r-%E6%B3%B0%E7%99%BC%E6%B3%B0%E5%9C%8B%E9%A4%90%E5%BB%B3-%E4%B9%9D%E9%BE%8D%E5%9F%8E-%E6%B3%B0%E5%9C%8B%E8%8F%9C-r9845","https://www.openrice.com/zh/hongkong/r-%E6%B3%B0%E9%87%91%E5%9C%8B-%E4%B9%9D%E9%BE%8D%E5%9F%8E-%E6%B3%B0%E5%9C%8B%E8%8F%9C-r689626"], link:"https://www.openrice.com/zh/hongkong/r-%E6%B3%B0%E7%99%BC%E6%B3%B0%E5%9C%8B%E9%A4%90%E5%BB%B3-%E4%B9%9D%E9%BE%8D%E5%9F%8E-%E6%B3%B0%E5%9C%8B%E8%8F%9C-r9845"},
       {t:"約 20:10–20:40", name:"地茂館", lat:22.33, lng:114.188, ride:"步行 5–10 分鐘。", link:g("地茂館 九龍城")},
       {t:"約 21:15 結束", name:"返逸東酒店", lat:22.3080, lng:114.1718, ride:"步行去宋皇臺站 8–10 分鐘。屯馬線 → 紅磡轉荃灣線去佐敦，約 25–35 分鐘。再步行 8–12 分鐘。", link:g("Eaton HK Jordan")}
     ]},
@@ -217,7 +224,8 @@ function render(){
   let html="";
   day.stops.forEach((s, idx) => {
     if (s.ride) html += `<tr class="ride${s.shuttle?" shuttle":""}" data-idx="${idx}"><td></td><td></td><td></td><td>${s.ride}</td></tr>`;
-    html += `<tr class="loc" data-name="${s.name}" data-idx="${idx}"><td class="t">${idx+1}</td><td>${s.name}<br><span class="hint">${s.t}</span></td><td><a href="${s.link}" target="_blank" rel="noopener">${s.link.includes("openrice")?"OpenRice":"Google Map"}</a></td><td></td></tr>`;
+    const linkHtml = s.links ? s.links.map((l,i) => `<a href="${l}" target="_blank" rel="noopener">OpenRice${i===0?"（泰發）":"（泰金國）"}</a>`).join(" ") : `<a href="${s.link}" target="_blank" rel="noopener">${s.link.includes("openrice")?"OpenRice":"Google Map"}</a>`;
+    html += `<tr class="loc" data-name="${s.name}" data-idx="${idx}"><td class="t">${idx+1}</td><td>${s.name}<br><span class="hint">${s.t}</span></td><td>${linkHtml}</td><td></td></tr>`;
   });
   document.getElementById("app").innerHTML = `<div class="alert">專車只係機場→逸東、逸東→探索家。其餘用港鐵、天星小輪、電車、穿梭巴士或機場快線。巧佳星期六多數休息，去之前先打電話。點擊地點可高亮，再點一次可取消。</div><h2>${day.title}</h2><p class="sub">${day.sub}</p><table class="main"><thead><tr><th>#</th><th>地點</th><th>連結</th><th>交通</th></tr></thead><tbody>${html}</tbody></table>`;
   document.querySelectorAll("tr.loc").forEach((tr, i) => tr.onclick = ev => {
@@ -276,6 +284,28 @@ function render(){
   }, {passive:true});
   document.addEventListener("touchend", () => { dragging = false; });
 })();
+
+// GPS 定位
+document.getElementById("gpsBtn").onclick = () => {
+  if (!navigator.geolocation) { alert("瀏覽器唔支援定位"); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude, lng = pos.coords.longitude;
+    if (!map) return;
+    if (window._me) window._me.setMap(null);
+    window._me = new google.maps.Marker({
+      position: {lat, lng},
+      map,
+      title: "我的位置",
+      icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: "#2563eb", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2 }
+    });
+    map.setCenter({lat, lng});
+    map.setZoom(16);
+    const el = document.getElementById("pinName");
+    el.textContent = "我的位置";
+    el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 2000);
+  }, () => alert("定位失敗，請允許位置權限"));
+};
 </script>
 </body>
 </html>
